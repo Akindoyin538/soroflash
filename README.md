@@ -1,12 +1,12 @@
-# SoroScan: Soroban Event Indexer 🔍
+# SoroFlash: Soroban Event Indexer 🔍
 
 ![Rust](https://img.shields.io/badge/Soroban-Rust-orange?style=for-the-badge&logo=rust) ![Django](https://img.shields.io/badge/Backend-Django-green?style=for-the-badge&logo=django) ![GraphQL](https://img.shields.io/badge/API-GraphQL-e535ab?style=for-the-badge&logo=graphql) ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-[![Django CI](https://github.com/SoroScan/soroscan/actions/workflows/django.yml/badge.svg)](https://github.com/SoroScan/soroscan/actions/workflows/django.yml) [![Soroban CI](https://github.com/SoroScan/soroscan/actions/workflows/soroban.yml/badge.svg)](https://github.com/SoroScan/soroscan/actions/workflows/soroban.yml)
+[![Django CI](https://github.com/SoroScan/soroflash/actions/workflows/django.yml/badge.svg)](https://github.com/SoroScan/soroflash/actions/workflows/django.yml) [![Soroban CI](https://github.com/SoroScan/soroflash/actions/workflows/soroban.yml/badge.svg)](https://github.com/SoroScan/soroflash/actions/workflows/soroban.yml)
 
 > **The Graph for Soroban — index, query, and subscribe to smart contract events.**
 
-**SoroScan** is a developer-focused indexing service for Soroban smart contract events on the Stellar blockchain. It combines a Rust-based Soroban smart contract with a Django backend to provide real-time event ingestion, GraphQL/REST APIs, and webhook notifications.
+**SoroFlash** is a developer-focused indexing service for Soroban smart contract events on the Stellar blockchain. It combines a Rust-based Soroban smart contract with a Django backend to provide real-time event ingestion, GraphQL/REST APIs, and webhook notifications.
 
 Built for developers who need reliable event data without running their own infrastructure.
 
@@ -24,7 +24,7 @@ Built for developers who need reliable event data without running their own infr
 
 ## 🏗️ Architecture Overview
 
-SoroScan follows a **hybrid on-chain/off-chain pattern** for maximum flexibility and reliability.
+SoroFlash follows a **hybrid on-chain/off-chain pattern** for maximum flexibility and reliability.
 
 ```
 ┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
@@ -46,11 +46,11 @@ SoroScan follows a **hybrid on-chain/off-chain pattern** for maximum flexibility
 ## 🗂️ Project Structure
 
 ```
-soroscan/
+soroflash/
 ├── soroban-contracts/        # Rust smart contracts
 │   └── soroscan_core/        # Core indexing contract
 │       └── src/lib.rs        # Contract logic & event emission
-└── django-backend/           # Python backend API
+├── django-backend/           # Python backend API
     └── soroscan/
         └── ingest/           # Ingestion & API module
             ├── models.py     # TrackedContract, ContractEvent, WebhookSubscription
@@ -58,6 +58,9 @@ soroscan/
             ├── schema.py     # GraphQL schema (Strawberry)
             ├── stellar_client.py  # Soroban RPC interaction
             └── tasks.py      # Celery webhook dispatcher
+└── soroscan-frontend/         # Independent Next.js frontend project
+    ├── package.json           # Frontend-owned Node.js dependencies and scripts
+    └── app/                   # Frontend routes and UI
 ```
 
 ---
@@ -82,7 +85,7 @@ See [ENVIRONMENT.md](docs/ENVIRONMENT.md) for the complete list of required and 
 
 ## 🚀 Quick Start
 
-Get SoroScan running locally in under 5 minutes with Docker Compose.
+Get SoroFlash running locally in under 5 minutes with Docker Compose.
 
 ### Prerequisites
 
@@ -93,8 +96,8 @@ Get SoroScan running locally in under 5 minutes with Docker Compose.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/SoroScan/soroscan.git
-cd soroscan
+git clone https://github.com/SoroScan/soroflash.git
+cd soroflash
 
 # 2. Copy environment file and configure if needed
 cp django-backend/.env.example django-backend/.env
@@ -111,6 +114,23 @@ docker-compose up --build
 That's it! The stack auto-runs migrations on startup and supports live code reloading.
 
 **Port Conflicts?** Edit `django-backend/.env` and uncomment the port override variables.
+
+### Frontend Development
+
+The Next.js frontend is maintained as an independent project with its own
+`package.json` and `pnpm-lock.yaml`. It is not part of the root JavaScript
+workspace. Start the backend first when working with API-backed pages, then run:
+
+```bash
+cd soroscan-frontend
+corepack enable
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+The frontend is available at `http://localhost:3000`. See
+[`soroscan-frontend/README.md`](soroscan-frontend/README.md) for frontend tests,
+GraphQL code generation, and environment configuration.
 
 ### Local Webhook Simulator
 
@@ -194,7 +214,7 @@ soroban contract deploy \
 
 ## 🚢 Production Deployment
 
-SoroScan includes production-ready Kubernetes manifests for self-hosted deployments.
+SoroFlash includes production-ready Kubernetes manifests for self-hosted deployments.
 
 ### Prerequisites
 
@@ -202,7 +222,7 @@ SoroScan includes production-ready Kubernetes manifests for self-hosted deployme
 - kubectl configured
 - PostgreSQL database (managed or self-hosted)
 - Redis instance (managed or self-hosted)
-- Container registry with SoroScan image
+- Container registry with SoroFlash image
 - (Optional) External Secrets Operator for secret management
 
 ### 1. Build and Push Container Image
